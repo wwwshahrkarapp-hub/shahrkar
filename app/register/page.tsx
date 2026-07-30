@@ -46,7 +46,18 @@ export default function RegisterPage() {
         })}
       </div>
 
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+      <form
+  onSubmit={(e) => {
+    e.preventDefault()
+
+    if (role === 'company') {
+      window.location.href = '/company'
+    } else {
+      window.location.href = '/applicant'
+    }
+  }}
+  className="space-y-4"
+>
         <Field
           id="name"
           label={role === 'company' ? 'نام شرکت' : 'نام و نام خانوادگی'}

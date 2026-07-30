@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 
 import {
   LayoutDashboard,
@@ -16,11 +15,11 @@ import { DashboardShell, StatCard, type NavItem } from '@/components/dashboard-s
 import { Button } from '@/components/ui/button'
 
 const nav: NavItem[] = [
-  { label: 'داشبورد', icon: LayoutDashboard, active: true, href: '#dashboard' },
-  { label: 'آگهی‌های من', icon: FileText, href: '#recent-jobs' },
-  { label: 'درخواست‌ها', icon: Users, href: '#top-candidates' },
-  { label: 'پروفایل شرکت', icon: Building2, href: '#company-profile' },
-  { label: 'تنظیمات', icon: Settings, href: '#settings' },
+  { label: 'داشبورد', icon: LayoutDashboard, active: true },
+  { label: 'آگهی‌های من', icon: FileText },
+  { label: 'درخواست‌ها', icon: Users },
+  { label: 'پروفایل شرکت', icon: Building2 },
+  { label: 'تنظیمات', icon: Settings },
 ]
 
 const postings = [
@@ -52,12 +51,10 @@ export default function CompanyPanel() {
             مدیریت آگهی‌ها و درخواست‌های استخدام
           </p>
         </div>
-        <Link href="/company/jobs/new">
-  <Button size="lg" className="gap-2 bg-gold text-gold-foreground hover:bg-gold/90">
-    <Plus className="size-4" />
-    ثبت آگهی جدید
-  </Button>
-</Link>
+        <Button size="lg" className="gap-2 bg-gold text-gold-foreground hover:bg-gold/90">
+          <Plus className="size-4" />
+          ثبت آگهی جدید
+        </Button>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
