@@ -16,11 +16,11 @@ import { Button } from '@/components/ui/button'
 import { jobs } from '@/lib/data'
 
 const nav: NavItem[] = [
-  { label: 'داشبورد', icon: LayoutDashboard, active: true },
-  { label: 'جستجوی شغل', icon: Search },
-  { label: 'رزومه من', icon: FileText },
-  { label: 'مشاغل ذخیره‌شده', icon: Bookmark },
-  { label: 'تنظیمات', icon: Settings },
+  { label: 'داشبورد', icon: LayoutDashboard, href: '/applicant', active: true },
+  { label: 'جستجوی شغل', icon: Search, href: '/jobs' },
+  { label: 'رزومه من', icon: FileText, href: '/applicant' },
+  { label: 'مشاغل ذخیره‌شده', icon: Bookmark, href: '/jobs' },
+  { label: 'تنظیمات', icon: Settings, href: '/applicant/settings' },
 ]
 
 const applications = [
@@ -49,13 +49,13 @@ export default function ApplicantPanel() {
             امروز ۵ فرصت شغلی جدید متناسب با پروفایل شما ثبت شده است.
           </p>
         </div>
+
         <Button size="lg" className="gap-2 bg-gold text-gold-foreground hover:bg-gold/90">
           <Search className="size-4" />
           جستجوی شغل
         </Button>
       </div>
 
-      {/* Profile completeness */}
       <div className="mt-6 rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-foreground">تکمیل پروفایل</h2>
@@ -83,17 +83,12 @@ export default function ApplicantPanel() {
           </div>
           <div className="divide-y divide-border">
             {applications.map((app) => (
-              <div
-                key={app.title}
-                className="flex items-center gap-3 p-4"
-              >
+              <div key={app.title} className="flex items-center gap-3 p-4">
                 <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-secondary text-gold">
                   <Building2 className="size-5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {app.title}
-                  </p>
+                  <p className="truncate text-sm font-medium text-foreground">{app.title}</p>
                   <p className="truncate text-xs text-muted-foreground">{app.company}</p>
                 </div>
                 <span
@@ -117,9 +112,7 @@ export default function ApplicantPanel() {
             {suggested.map((job) => (
               <div key={job.id} className="flex items-center gap-3 p-4">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {job.title}
-                  </p>
+                  <p className="truncate text-sm font-medium text-foreground">{job.title}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     {job.company} · {job.location}
                   </p>

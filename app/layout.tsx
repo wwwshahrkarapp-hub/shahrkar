@@ -12,25 +12,28 @@ const vazir = Vazirmatn({
 export const metadata: Metadata = {
   title: 'شهرکار | جستجوی هوشمند فرصت‌های شغلی',
   description:
-    'شهرکار، پلتفرم حرفه‌ای کاریابی؛ هزاران فرصت شغلی از بهترین شرکت‌های ایران را جستجو کنید و رزومه بسازید.',
-  generator: 'v0.app',
+    'شهرکار، پلتفرم حرفه‌ای کاریابی؛ هزاران فرصت شغلی از بهترین شرکت‌های ایران را جستجو کنید.',
 }
 
 export const viewport: Viewport = {
   colorScheme: 'dark',
-  themeColor: '#241d10',
+  themeColor: '#080808',
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="fa" dir="rtl" className={`${vazir.variable} bg-background`}>
+    <html lang="fa" dir="rtl" className={vazir.variable}>
       <body className="font-sans antialiased">
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+
+        {process.env.NODE_ENV === 'production' && (
+          <Analytics />
+        )}
+
       </body>
     </html>
   )

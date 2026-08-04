@@ -1,15 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NewJobPage() {
+  const router = useRouter();
+
   const [form, setForm] = useState({
     title: "",
     company: "",
     city: "",
     salary: "",
     description: "",
-  })
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -17,21 +20,39 @@ export default function NewJobPage() {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    alert("آگهی با موفقیت ثبت شد (نسخه آزمایشی)")
-    console.log(form)
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const res = await fetch("/api/jobs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "خطا در ثبت آگهی");
+      return;
+    }
+
+    alert("آگهی با موفقیت ثبت شد.");
+
+window.location.href = "/jobs";
+  };
 
   return (
     <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">ثبت آگهی جدید</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        ثبت آگهی جدید
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-
         <input
           name="title"
           placeholder="عنوان شغل"
@@ -79,8 +100,7 @@ export default function NewJobPage() {
         >
           ثبت آگهی
         </button>
-
       </form>
     </main>
-  )
+  );
 }

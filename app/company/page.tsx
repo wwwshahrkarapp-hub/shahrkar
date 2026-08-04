@@ -16,11 +16,32 @@ import { DashboardShell, StatCard, type NavItem } from '@/components/dashboard-s
 import { Button } from '@/components/ui/button'
 
 const nav: NavItem[] = [
-  { label: 'داشبورد', icon: LayoutDashboard, active: true, href: '#dashboard' },
-  { label: 'آگهی‌های من', icon: FileText, href: '#recent-jobs' },
-  { label: 'درخواست‌ها', icon: Users, href: '#top-candidates' },
-  { label: 'پروفایل شرکت', icon: Building2, href: '#company-profile' },
-  { label: 'تنظیمات', icon: Settings, href: '#settings' },
+  {
+    label: 'داشبورد',
+    icon: LayoutDashboard,
+    href: '/company',
+    active: true,
+  },
+  {
+    label: 'آگهی‌های من',
+    icon: FileText,
+    href: '/company/jobs',
+  },
+  {
+    label: 'درخواست‌ها',
+    icon: Users,
+    href: '/company/requests',
+  },
+  {
+    label: 'پروفایل شرکت',
+    icon: Building2,
+    href: '/company/profile',
+  },
+  {
+    label: 'تنظیمات',
+    icon: Settings,
+    href: '/company/settings',
+  },
 ]
 
 const postings = [
