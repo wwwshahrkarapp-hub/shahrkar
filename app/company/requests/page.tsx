@@ -51,7 +51,9 @@ let jobs: {
 
 try {
   jobs = JSON.parse(await fs.readFile(jobsPath, "utf8"));
-} catch {}
+} catch (error) {
+  console.log("Failed to load jobs:", error);
+}
   return (
     <main className="min-h-screen bg-black text-white p-6">
       <div className="mx-auto max-w-5xl">
