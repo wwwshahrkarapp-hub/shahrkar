@@ -33,19 +33,21 @@ export async function POST(req: Request) {
 
   if(savedCode === code){
 
+  removeOtp(phone)
 
-    removeOtp(phone)
+  return NextResponse.json({
 
+    success:true,
 
-    return NextResponse.json({
+    user:{
+      phone
+    },
 
-      success:true,
+    message:"کد صحیح است"
 
-      message:"کد صحیح است"
+  })
 
-    })
-
-  }
+}
 
 
   return NextResponse.json({

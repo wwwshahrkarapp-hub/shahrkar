@@ -33,3 +33,24 @@ button,
 input {
   font-family: inherit;
 }
+
+
+@keyframes registerGlow {
+  0%, 100% {
+    background-color: #fde68a;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 5px 15px rgba(250, 204, 21, 0.25);
+  }
+
+  50% {
+    background-color: #eab308;
+    transform: translateY(-5px) scale(1.08);
+    box-shadow: 
+      0 0 20px rgba(250, 204, 21, 0.9),
+      0 0 45px rgba(250, 204, 21, 0.6);
+  }
+}
+
+.register-glow {
+  animation: registerGlow 1.2s ease-in-out infinite;
+}

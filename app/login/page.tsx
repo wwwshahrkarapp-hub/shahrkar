@@ -1,12 +1,19 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { useRouter } from "next/navigation"
+import { signInWithCustomToken } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import PageHeader from "@/components/page-header";
 
 
-export default function LoginPage(){
+function LoginContent(){
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get("redirect")
 
 
   const [phone,setPhone] = useState("")
@@ -124,13 +131,78 @@ export default function LoginPage(){
 
 
       alert(
-        "ورود موفق بود"
-      )
+  "ورود موفق بود"
+)
+
+const userRes = await fetch("/api/login-phone", {
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+    phone
+  })
+})
 
 
-      router.push(
-        "/applicant"
-      )
+const userData = await userRes.json()
+
+
+if(!userData.success){
+
+  alert(userData.error)
+
+  return
+
+}
+localStorage.setItem(
+  "user",
+  JSON.stringify(userData.user)
+)
+
+alert(
+  JSON.stringify(userData.user)
+)
+console.log(
+  "SAVED USER:",
+  localStorage.getItem("user")
+)
+const tokenRes = await fetch("/api/create-token", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    uid: userData.user.uid,
+  }),
+});
+
+const tokenData = await tokenRes.json();
+
+if (!tokenData.success) {
+  alert(tokenData.error);
+  return;
+}
+
+await signInWithCustomToken(
+  auth,
+  tokenData.token
+);
+
+console.log(
+  "FIREBASE AUTH USER:",
+  auth.currentUser
+);
+await new Promise(
+  resolve => setTimeout(resolve, 1000)
+);
+if (redirect) {
+  router.push(redirect)
+} else if (userData.user.role === "company") {
+  router.push("/company")
+} else {
+  router.push("/applicant")
+}
 
 
 
@@ -157,29 +229,33 @@ export default function LoginPage(){
 
   return (
     <div
-      className="
-      min-h-screen
-      flex
-      items-center
-      justify-center
-      bg-[#090807]
-      p-5
-      "
+className="
+min-h-screen
+flex
+items-center
+justify-center
+bg-background
+text-foreground
+p-6
+"
     >
 
 
-      <div
-        className="
-        w-full
-        max-w-md
-        rounded-2xl
-        bg-[#0f0e0c]
-        border
-        border-[#2b2418]
-        shadow-2xl
-        p-6
-        "
-      >
+
+   
+   <div
+className="
+w-full
+max-w-md
+rounded-2xl
+border
+border-yellow-500/20
+bg-card
+shadow-lg
+shadow-yellow-500/5
+p-6
+"
+>
 
 
 
@@ -204,12 +280,12 @@ export default function LoginPage(){
               w-14
               h-14
               rounded-full
-              bg-[#e8b84b]
+            bg-yellow-500
               flex
               items-center
               justify-center
               text-black
-              text-2xl
+              text-×1
               shadow-lg
               "
             >
@@ -226,7 +302,7 @@ export default function LoginPage(){
             className="
             text-3xl
             font-bold
-            text-[#e8b84b]
+            text-yellow-500
             "
           >
 
@@ -237,7 +313,7 @@ export default function LoginPage(){
 
           <p
             className="
-            text-gray-400
+            text-zinc-400
             mt-2
             "
           >
@@ -253,13 +329,14 @@ export default function LoginPage(){
 
 
         <h2
-          className="
-          text-white
-          text-2xl
-          font-bold
-          text-right
-          mb-2
-          "
+         className="
+text-white
+text-2xl
+font-bold
+text-right
+mb-2
+mt-10
+"
         >
 
           ورود به شهرکار
@@ -324,19 +401,21 @@ export default function LoginPage(){
 
                 placeholder="09123456789"
 
-                className="
-                w-full
-                bg-[#17140f]
-                border
-                border-[#e8b84b]
-                text-white
-                rounded-xl
-                p-4
-                outline-none
-                focus:ring-2
-                focus:ring-[#e8b84b]
-                "
-              />
+           className="
+w-full
+rounded-2xl
+border
+border-border
+bg-background
+px-4
+py-3
+text-foreground
+outline-none
+focus:border-yellow-500
+focus:ring-2
+focus:ring-yellow-500/20
+"
+             />
 
 
 
@@ -346,15 +425,22 @@ export default function LoginPage(){
 
                 disabled={loading}
 
-                className="
-                w-full
-                bg-[#e8b84b]
-                text-black
-                font-bold
-                rounded-xl
-                p-4
-                hover:opacity-90
-                "
+      className="
+w-full
+rounded-2xl
+border
+border-yellow-500/40
+bg-yellow-950/70
+px-8
+py-3
+font-bold
+text-yellow-300
+shadow-lg
+shadow-yellow-500/20
+transition-all
+hover:scale-105
+hover:bg-yellow-900/80
+"
               >
 
                 {
@@ -411,20 +497,23 @@ export default function LoginPage(){
 
                 placeholder="123456"
 
-                className="
-                w-full
-                bg-[#17140f]
-                border
-                border-[#e8b84b]
-                text-white
-                rounded-xl
-                p-4
-                outline-none
-                focus:ring-2
-                focus:ring-[#e8b84b]
-                "
-              />
-
+   className="
+rounded-2xl
+border
+border-yellow-500/40
+bg-yellow-950/70
+px-8
+py-3
+font-bold
+text-yellow-300
+shadow-lg
+shadow-yellow-500/20
+transition-all
+hover:scale-105
+hover:bg-yellow-900/80
+"
+      
+/>
 
 
               <button
@@ -433,16 +522,23 @@ export default function LoginPage(){
 
                 disabled={loading}
 
-                className="
-                w-full
-                bg-[#e8b84b]
-                text-black
-                font-bold
-                rounded-xl
-                p-4
-                hover:opacity-90
-                "
-              >
+className="
+rounded-2xl
+border
+border-emerald-500/40
+bg-emerald-950/70
+px-8
+py-3
+font-bold
+text-emerald-300
+shadow-lg
+shadow-emerald-500/20
+transition-all
+hover:scale-105
+hover:bg-emerald-900/80
+"
+  
+            >
 
                 {
                   loading
@@ -474,4 +570,12 @@ export default function LoginPage(){
   )
 
 
+}
+
+export default function LoginPage(){
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  )
 }

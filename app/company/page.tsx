@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -64,8 +64,114 @@ const statusStyle: Record<string, string> = {
 }
 
 export default function CompanyPanel() {
+
+
+const [companyName, setCompanyName] = useState("");
+
+const [newCandidates, setNewCandidates] = useState<any[]>([]);
+
+const [stats, setStats] = useState({
+  activeJobs: 0,
+  applications: 0,
+  views: 0,
+  hired: 0,
+});
+
+const [recentJobs, setRecentJobs] = useState<any[]>([]);
+
+const [showAllJobs, setShowAllJobs] = useState(false); 
+
+  
+useEffect(() => {
+
+  const savedUser = localStorage.getItem("user");
+
+  if(savedUser){
+
+    const user = JSON.parse(savedUser);
+
+    console.log("COMPANY USER:", user);
+
+    setCompanyName(user.name || "کارفرما");
+
+
+    fetch("/api/applications")
+    .then((res)=>res.json())
+ 
+      fetch("/api/applications")
+        .then((res)=>res.json())
+        .then((data)=>{
+
+          const candidates = data.filter(
+            (item:any)=>
+              item.ownerUid === user.uid &&
+              item.status === "در حال بررسی"
+          );
+
+          setNewCandidates(candidates.slice(0,3)) 
+
+const companyApplications = data.filter(
+  (item:any)=> item.ownerUid === user.uid
+);
+
+setStats((prev)=>({
+  ...prev,
+  applications: companyApplications.length,
+  hired: companyApplications.filter(
+    (item:any)=> item.status === "تأیید شد"
+  ).length
+}));
+
+
+        });
+
+
+      fetch("/api/jobs")
+        .then((res)=>res.json())
+        .then((data)=>{
+
+         
+const companyJobs = data
+.filter(
+  (job:any)=> job.ownerUid === user.uid
+)
+.sort(
+  (a:any,b:any)=>
+    b.createdAt._seconds - a.createdAt._seconds
+);
+
+
+          setRecentJobs(companyJobs);
+
+
+setStats((prev)=>({
+  ...prev,
+  activeJobs: companyJobs.filter(
+    (job:any)=>job.status === "active"
+  ).length,
+
+  views: companyJobs.reduce(
+    (sum:any, job:any)=>sum + (job.views || 0),
+    0
+  )
+}));
+
+
+        });
+
+
+  }
+
+}, []);
+
+
   return (
-    <DashboardShell role="پنل کارفرما" userName="شرکت شهرکار" nav={nav}>
+    <DashboardShell
+      role="پنل کارفرما"
+      userName={companyName}
+      nav={nav}
+    > 
+
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-extrabold text-foreground">داشبورد کارفرما</h1>
@@ -74,40 +180,224 @@ export default function CompanyPanel() {
           </p>
         </div>
         <Link href="/company/jobs/new">
-  <Button size="lg" className="gap-2 bg-gold text-gold-foreground hover:bg-gold/90">
+<Button
+  size="lg"
+  className="
+  gap-2
+  rounded-xl
+  bg-yellow-500
+  px-5
+  font-bold
+  text-black
+  shadow-lg
+  shadow-yellow-500/20
+  transition-all
+  hover:scale-105
+  hover:bg-yellow-400
+  "
+>
+ 
+
     <Plus className="size-4" />
     ثبت آگهی جدید
   </Button>
 </Link>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="آگهی‌های فعال" value="۱۲" icon={Briefcase} hint="۳ آگهی این ماه" />
-        <StatCard label="کل درخواست‌ها" value="۳۴۸" icon={Users} hint="+۲۴ امروز" />
-        <StatCard label="بازدید آگهی‌ها" value="۱۸٬۴۰۰" icon={Eye} hint="این هفته" />
-        <StatCard label="استخدام‌شده‌ها" value="۲۷" icon={UserCheck} hint="امسال" />
+
+<div className="mt-4 grid grid-cols-2 gap-3">
+
+  <StatCard
+    label="آگهی‌های فعال"
+    value={stats.activeJobs.toLocaleString("fa-IR")}
+    icon={Briefcase}
+    hint="آگهی‌های فعال شما"
+  />
+
+  <StatCard
+    label="کل درخواست‌ها"
+    value={stats.applications.toLocaleString("fa-IR")}
+    icon={Users}
+    hint="درخواست‌های دریافتی"
+  />
+
+  <StatCard
+    label="بازدید آگهی‌ها"
+    value={stats.views.toLocaleString("fa-IR")}
+    icon={Eye}
+    hint="مجموع بازدیدها"
+  />
+
+  <StatCard
+    label="استخدام‌شده‌ها"
+    value={stats.hired.toLocaleString("fa-IR")}
+    icon={UserCheck}
+    hint="بر اساس تأیید درخواست‌ها"
+  />
+
+</div>
+
+
+<div
+  className="
+  mt-6
+  rounded-2xl
+  border
+  border-yellow-500/20
+  bg-card
+  p-5
+  shadow-lg
+  shadow-yellow-500/5
+  "
+>
+
+  <div className="flex items-center justify-between mb-4">
+
+    <h2 className="font-bold text-foreground">
+      کاندیداهای جدید ⭐
+    </h2>
+
+    <Link
+  href="/company/requests"
+  className="
+  rounded-xl
+  border
+  border-yellow-500/40
+  bg-yellow-500/10
+  px-4
+  py-2
+  text-sm
+  font-bold
+  text-yellow-400
+  shadow-lg
+  shadow-yellow-500/10
+  transition-all
+  hover:scale-105
+  hover:bg-yellow-500/20
+  "
+>
+  مشاهده همه
+</Link>
+
+  </div>
+
+
+  {
+    newCandidates.length === 0 ? (
+
+      <p className="text-sm text-muted-foreground">
+        کاندیدای جدیدی وجود ندارد
+      </p>
+
+    ) : (
+
+      <div className="space-y-3">
+
+      {
+        newCandidates.map((candidate)=>(
+          
+          <div
+          key={candidate.id}
+          className="
+          flex
+          items-center
+          justify-between
+          rounded-xl
+          border
+          border-border
+          bg-background
+          p-3
+          "
+          >
+
+            <div className="text-right">
+
+              <p className="font-bold text-foreground">
+                {candidate.name}
+              </p>
+
+              <p className="text-xs text-muted-foreground">
+                درخواست استخدام جدید
+              </p>
+
+            </div>
+
+
+            <span
+            className="
+            rounded-xl
+            bg-yellow-500/10
+            px-3
+            py-1
+            text-xs
+            font-bold
+            text-yellow-400
+            "
+            >
+              جدید
+            </span>
+
+
+          </div>
+
+        ))
+      }
+
       </div>
+
+    )
+  }
+
+
+</div>
+
+
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card lg:col-span-2">
           <div className="flex items-center justify-between border-b border-border p-5">
-            <h2 className="font-bold text-foreground">آگهی‌های اخیر</h2>
-            <Button variant="ghost" size="sm" className="text-gold">
-              مشاهده همه
-            </Button>
+            <h2 className="font-bold text-foreground">آگهی‌های اخیر ⭐  </h2>
+            
+<Button
+  variant="ghost"
+  size="sm"
+  onClick={()=>setShowAllJobs(!showAllJobs)}
+  className="
+  rounded-xl
+  border
+  border-yellow-500/40
+  bg-yellow-500/10
+  px-4
+  py-2
+  text-sm
+  font-bold
+  text-yellow-400
+  shadow-lg
+  shadow-yellow-500/10
+  transition-all
+  hover:scale-105
+  hover:bg-yellow-500/20
+  "
+>
+  {showAllJobs ? "نمایش کمتر" : "مشاهده همه"}
+</Button>
+
+
           </div>
           <div className="divide-y divide-border">
-            {postings.map((post) => (
+          {(showAllJobs ? recentJobs : recentJobs.slice(0,3)).map((post:any)=>(
               <div
                 key={post.title}
                 className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <h3 className="font-medium text-foreground">{post.title}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {post.applicants.toLocaleString('fa-IR')} درخواست ·{' '}
-                    {post.views.toLocaleString('fa-IR')} بازدید
-                  </p>
+
+                  
+<p className="mt-1 text-xs text-muted-foreground">
+ آگهی فعال · {post.city || "بدون شهر"}
+</p>
+
                 </div>
                 <span
                   className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${statusStyle[post.status]}`}
@@ -116,32 +406,12 @@ export default function CompanyPanel() {
                 </span>
               </div>
             ))}
-          </div>
+
+                    </div>
+</div>
+
         </div>
 
-        <div className="rounded-2xl border border-border bg-card">
-          <div className="border-b border-border p-5">
-            <h2 className="font-bold text-foreground">بهترین کارجویان</h2>
-            <p className="mt-1 text-xs text-muted-foreground">بر اساس تطابق مهارت</p>
-          </div>
-          <div className="divide-y divide-border">
-            {applicants.map((a) => (
-              <div key={a.name} className="flex items-center gap-3 p-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-sm font-bold text-gold">
-                  {a.name.charAt(0)}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">{a.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{a.role}</p>
-                </div>
-                <span className="shrink-0 text-sm font-bold text-gold">
-                  {a.match.toLocaleString('fa-IR')}٪
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </DashboardShell>
-  )
+      </DashboardShell>
+    )
 }

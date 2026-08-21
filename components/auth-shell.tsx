@@ -58,10 +58,10 @@ export function AuthShell({
       {/* Form side */}
       <div className="flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-16">
         <div className="mx-auto w-full max-w-md">
-          <div className="mb-8 lg:hidden">
-            <Link href="/">
-              <Logo />
-            </Link>
+         <div className="mb-8 flex justify-center">
+  <Link href="/" aria-label="شهرکار">
+    <Logo />
+  </Link>
           </div>
           <h1 className="text-2xl font-extrabold text-foreground">{title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>

@@ -1,44 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "data", "applications.json");
+import { NextResponse } from "next/server";
+import { adminDb } from "@/lib/firebase-admin";
 
 export async function GET() {
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, "[]", "utf8");
+  try {
+    const snapshot = await adminDb
+      .collection("applications")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const applications = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return NextResponse.json(applications);
+
+  } catch (error: any) {
+    console.error("APPLICATION GET ERROR:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message,
+      },
+      {
+        status: 500,
+      }
+    );
   }
-
-  const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-  return NextResponse.json(data);
-}
-
-export async function POST(request: NextRequest) {
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, "[]", "utf8");
-  }
-
-  const body = await request.json();
-
-  const applications = JSON.parse(
-    fs.readFileSync(filePath, "utf8")
-  );
-
-  const newApplication = {
-    id: Date.now(),
-    ...body,
-    status: "در انتظار",
-    createdAt: new Date().toISOString(),
-  };
-
-  applications.push(newApplication);
-
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(applications, null, 2),
-    "utf8"
-  );
-
-  return NextResponse.json(newApplication);
 }

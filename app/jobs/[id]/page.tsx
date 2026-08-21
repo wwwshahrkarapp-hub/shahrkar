@@ -1,29 +1,48 @@
 import { notFound } from "next/navigation";
 import fs from "fs/promises";
+import JobActions from "./JobActions";
 import path from "path";
 import Link from "next/link";
-
+import SaveButton from "./SaveButton";
 type Job = {
   id: number;
   title: string;
   company: string;
   city: string;
   salary: string;
+  type?: string;
   description: string;
   createdAt: string;
 };
 
 async function getJob(id: string): Promise<Job | null> {
-  const filePath = path.join(process.cwd(), "data", "jobs.json");
 
   try {
-    const file = await fs.readFile(filePath, "utf8");
-    const jobs: Job[] = JSON.parse(file);
 
-    return jobs.find((job) => String(job.id) === id) || null;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/jobs/${id}`,
+      {
+        cache: "no-store",
+      }
+    );
+
+
+    if (!res.ok) {
+      return null;
+    }
+
+
+    const data = await res.json();
+
+    return data;
+
+
   } catch {
+
     return null;
+
   }
+
 }
 
 export default async function JobDetails({
@@ -40,10 +59,10 @@ export default async function JobDetails({
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-2xl mx-auto rounded-2xl bg-zinc-900 p-6">
+  <main className="min-h-screen bg-background text-foreground p-6">
+    <div className="max-w-2xl mx-auto rounded-3xl border border-yellow-500/20 bg-card p-8 shadow-xl shadow-yellow-500/10">
 
-        <h1 className="mb-4 text-3xl font-bold">
+      <h1 className="mb-6 text-3xl font-extrabold text-yellow-400">
           {job.title}
         </h1>
 
@@ -69,23 +88,7 @@ export default async function JobDetails({
           {job.description}
         </p>
 
-        <div className="mt-8 flex gap-4">
-
-          <Link
-            href={`/jobs/${job.id}/apply`}
-            className="rounded-lg bg-green-600 px-6 py-3 font-bold text-white"
-          >
-            📩 ارسال درخواست استخدام
-          </Link>
-
-          <Link
-            href="/jobs"
-            className="rounded-lg bg-zinc-700 px-6 py-3 font-bold"
-          >
-            ← بازگشت
-          </Link>
-
-        </div>
+       <JobActions job={job} />
 
       </div>
     </main>

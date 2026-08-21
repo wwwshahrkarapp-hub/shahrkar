@@ -18,26 +18,31 @@ export type Category = {
 }
 
 export const categories: Category[] = [
+  { slug: 'simple-worker', title: 'کارگر ساده', count: 980, icon: Briefcase },
+
   { slug: 'it', title: 'فناوری اطلاعات و نرم‌افزار', count: 1240, icon: Code2 },
   { slug: 'marketing', title: 'بازاریابی و فروش', count: 860, icon: Megaphone },
   { slug: 'design', title: 'طراحی و هنر', count: 520, icon: PenTool },
-  { slug: 'finance', title: 'مالی و حسابداری', count: 430, icon: Wallet },
-  { slug: 'data', title: 'داده و تحلیل', count: 310, icon: BarChart3 },
-  { slug: 'support', title: 'پشتیبانی مشتریان', count: 275, icon: Headset },
-  { slug: 'management', title: 'مدیریت و منابع انسانی', count: 190, icon: Briefcase },
-  { slug: 'health', title: 'سلامت و درمان', count: 150, icon: Stethoscope },
+{
+  slug: 'mixed',
+  title: 'مختلط',
+  count: 0,
+  icon: Briefcase
+},
 ]
 
 export type Job = {
   id: string
   title: string
   company: string
-  location: string
-  type: string
+  city?: string
+  location?: string
+  type?: string
   salary: string
-  tags: string[]
-  postedAt: string
-  remote: boolean
+  description?: string
+  tags?: string[]
+  postedAt?: string
+  remote?: boolean
   category: string
 }
 

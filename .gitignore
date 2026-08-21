@@ -1,4 +1,8 @@
-# v0 sandbox internal files
+**/*backup*
+**/*backup.*
+**/*.bak
+**/*.back
+**/*.before-*# v0 sandbox internal files
 __v0_runtime_loader.js
 __v0_devtools.tsx
 __v0_jsx-dev-runtime.ts
@@ -17,3 +21,14 @@ node_modules
 
 /lib/generated/prisma
 firebase-admin-key.json
+
+out/
+*.backup.*
+*.backup
+tsconfig.tsbuildinfo
+
+*.backup*
+*.back
+*.txt
+out/
+tsconfig.tsbuildinfo

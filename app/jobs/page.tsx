@@ -1,62 +1,137 @@
-import fs from "fs";
-import path from "path";
 import Link from "next/link";
+import { JobCard } from "@/components/job-card";
+import BackButton from "@/components/back-button";
+import PageHeader from "@/components/page-header";
+import JobAccessLink from "@/components/job-access-link";
+import type { Job } from "@/lib/data";
+import { categories } from "@/lib/data";
+import JobFilters from "@/components/job-filters";
 
-const filePath = path.join(process.cwd(), "data", "jobs.json");
+export default async function JobsPage({
+  searchParams,
+}: {
+ searchParams: Promise<{
+  search?: string;
+  city?: string;
+  category?: string;
+type?: string;
+}>;
+}) {
 
-export default function JobsPage() {
-  let jobs: any[] = [];
+ const res = await fetch(
+  `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/jobs`,
+  {
+    cache: "no-store",
+  }
+);
 
-  if (fs.existsSync(filePath)) {
-    const file = fs.readFileSync(filePath, "utf8");
-    jobs = file ? JSON.parse(file) : [];
+let jobs: Job[] = await res.json();
+
+ const { search, city, category, type } = await searchParams;
+const selectedCategory = categories.find(
+  (cat) => cat.slug === category
+);
+
+  if (search) {
+    const words = search
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+    jobs = jobs.filter((job) => {
+      const text = `${job.title} ${job.company} ${job.city} ${job.description}`
+        .toLowerCase();
+
+      return words.every((word) => text.includes(word));
+    });
   }
 
-  return (
+if (city) {
+  jobs = jobs.filter(
+    (job) =>
+      String(job.city || "").toLowerCase() === city.toLowerCase()
+  );
+}
+
+if (type) {
+  jobs = jobs.filter(
+    (job) =>
+      String(job.type || "").toLowerCase() === type.toLowerCase()
+  );
+}
+
+
+if (category) {
+
+  if (category === "mixed") {
+
+    jobs = jobs.filter(
+      (job) => !job.category
+    );
+
+  } else {
+
+    jobs = jobs.filter(
+      (job) =>
+        String(job.category || "").toLowerCase() === category.toLowerCase()
+    );
+
+  }
+
+}
+
+return (
     <main className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        آگهی‌های استخدام
-      </h1>
+<PageHeader />
+
+<JobFilters />     
+
+<h1 className="text-xl md:text-2xl font-bold mb-6 text-center">
+  {selectedCategory
+    ? selectedCategory.title
+    : "آگهی‌های استخدام"}
+</h1>
+
+{selectedCategory && (
+  <p className="text-center text-gray-400 mb-8">
+    {jobs.length.toLocaleString("fa-IR")} آگهی فعال پیدا شد
+  </p>
+)}
 
       {jobs.length === 0 ? (
         <p className="text-center text-gray-400">
-          هنوز هیچ آگهی ثبت نشده است.
+          آگهی مرتبطی پیدا نشد.
         </p>
       ) : (
-        <div className="grid gap-6">
-          {jobs.map((job) => (
-            <Link
-              key={job.id}
-              href={`/jobs/${job.id}`}
-              className="block rounded-xl border border-zinc-800 bg-zinc-900 p-6 shadow transition hover:border-yellow-500 hover:bg-zinc-800"
-            >
-              <h2 className="mb-3 text-2xl font-bold text-white">
-                {job.title}
-              </h2>
 
-              <p className="mb-2 text-gray-300">
-                <strong>شرکت:</strong> {job.company}
-              </p>
 
-              <p className="mb-2 text-gray-300">
-                <strong>شهر:</strong> {job.city}
-              </p>
 
-              <p className="mb-4 text-gray-300">
-                <strong>حقوق:</strong> {job.salary}
-              </p>
+<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
-              <p className="text-gray-400 line-clamp-3">
-                {job.description}
-              </p>
+  {jobs.map((job) => (
+    <JobCard
+      key={job.id}
+      job={{
+        id: String(job.id),
+        title: job.title,
+        company: job.company,
+        location: job.city,
+        type: job.type || "قابل توافق",
+        salary: job.salary,
+        tags: [],
+        postedAt: "",
+        city: job.city || "",
+        category: job.category || "",
+        remote: false,
+      }}
+    />
+  ))}
 
-              <div className="mt-5 text-sm font-bold text-yellow-400">
-                مشاهده جزئیات ←
-              </div>
-            </Link>
-          ))}
-        </div>
+</div>
+
       )}
+
     </main>
   );
 }

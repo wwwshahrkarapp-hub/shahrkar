@@ -104,8 +104,8 @@ try {
   return (
 
     <AuthShell
-      title="ساخت حساب کاربری"
-      subtitle="نوع حساب خود را انتخاب کنید و ثبت‌نام کنید."
+     title="به شهرکار بپیوندید ⭐"
+subtitle="فرصت‌های شغلی مناسب خودتان را پیدا کنید؛ سریع، هوشمند و قابل اعتماد."
     >
 
 
@@ -147,21 +147,18 @@ try {
 
               onClick={() => setRole(opt.key)}
 
-              className={cn(
-
-                'flex flex-col items-center gap-2 rounded-xl border p-4 text-sm font-medium transition-all',
-
-                active
-
-                  ? 'border-gold bg-gold/10 text-gold'
-
-                  : 'border-border bg-secondary text-muted-foreground'
-
-              )}
+className={cn(
+  'group flex flex-col items-center gap-3 rounded-3xl border p-6 text-sm font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
+  active
+    ? 'border-yellow-400 bg-yellow-500/10 text-yellow-400 shadow-xl shadow-yellow-500/30 ring-2 ring-yellow-400/30'
+    : 'border-zinc-700 bg-zinc-900 text-gray-400 hover:border-yellow-500/40'
+)}
 
             >
 
-              <Icon className="size-6" />
+             <div className="rounded-2xl bg-yellow-500/10 p-3 text-yellow-400 group-hover:bg-yellow-500/20">
+  <Icon className="size-7" />
+</div>
 
               {opt.label}
 
@@ -173,8 +170,10 @@ try {
 
         })}
 
+</div>
 
-      </div>
+  <div className="rounded-3xl border border-yellow-500/20 bg-zinc-900/70 p-6 shadow-xl shadow-yellow-500/10">
+
       <form
         onSubmit={handleSubmit}
         className="space-y-4"
@@ -268,7 +267,7 @@ try {
         <Button
           type="submit"
           size="lg"
-          className="h-11 w-full bg-gold text-gold-foreground hover:bg-gold/90"
+        className="h-12 w-full rounded-2xl bg-yellow-500 text-black font-bold shadow-lg shadow-yellow-500/30 transition-all hover:bg-yellow-400 hover:scale-[1.02] hover:shadow-yellow-500/50"
         >
 
           ثبت‌نام
@@ -298,6 +297,8 @@ try {
 
 
       </p>
+
+</div>
 
 
     </AuthShell>

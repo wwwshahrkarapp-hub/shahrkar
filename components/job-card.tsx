@@ -5,10 +5,26 @@ import type { Job } from '@/lib/data'
 
 export function JobCard({ job }: { job: Job }) {
   return (
-    <article className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5">
+   <article
+  className="
+    group
+    flex
+    flex-col
+    rounded-2xl
+    border
+    border-border
+    bg-card
+    p-3
+    transition-all
+    hover:border-gold/50
+    hover:-translate-y-1
+    hover:shadow-xl
+    hover:shadow-gold/10
+  "
+>
       <div className="flex items-start gap-3">
-        <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-secondary text-gold">
-          <Building2 className="size-6" />
+        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-secondary text-gold">
+          <Building2 className="size-5" />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -25,8 +41,8 @@ export function JobCard({ job }: { job: Job }) {
         )}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {job.tags.map((tag) => (
+   <div className="mt-2 flex flex-wrap gap-1">
+       {(job.tags || []).map((tag) => (
           <span
             key={tag}
             className="rounded-md bg-secondary px-2 py-1 text-xs text-secondary-foreground"
@@ -36,7 +52,7 @@ export function JobCard({ job }: { job: Job }) {
         ))}
       </div>
 
-      <dl className="mt-4 grid grid-cols-1 gap-2 text-sm text-muted-foreground">
+    <dl className="mt-2 grid grid-cols-1 gap-1 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <MapPin className="size-4 text-gold/70" />
           <span>
@@ -50,19 +66,19 @@ export function JobCard({ job }: { job: Job }) {
         </div>
       </dl>
 
-      <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
+    <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Clock className="size-3.5" />
           {job.postedAt}
         </span>
 
         <Link href={`/jobs/${job.id}`}>
-          <Button
-            size="sm"
-            className="bg-gold text-gold-foreground hover:bg-gold/90"
-          >
-            مشاهده و ارسال
-          </Button>
+       <Button
+  size="sm"
+  className="rounded-xl bg-yellow-500 px-3 font-bold text-black shadow-lg shadow-yellow-500/30 transition-all hover:scale-105 hover:bg-yellow-400 hover:shadow-yellow-500/50"
+>
+  مشاهده و ارسال
+</Button>
         </Link>
       </div>
     </article>

@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/logo'
 
@@ -15,7 +14,7 @@ const navLinks = [
 ]
 
 export function SiteHeader() {
-  const [open, setOpen] = useState(false)
+
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -36,68 +35,51 @@ export function SiteHeader() {
 ))}
             
               
-             
-
-           
-              
+                        
            
           
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button
-            variant="ghost"
-            size="lg"
-            render={<Link href="/login">ورود</Link>}
-          />
-          <Button
-            size="lg"
-            className="bg-gold text-gold-foreground hover:bg-gold/90"
-            render={<Link href="/register">ثبت‌نام</Link>}
-          />
+        <Button
+  variant="ghost"
+  size="lg"
+  nativeButton={false}
+  render={<Link href="/login">ورود</Link>}
+/>
+
+<Button
+  size="lg"
+  nativeButton={false}
+className="register-glow rounded-2xl px-8 py-3 text-lg font-extrabold text-black transition-all hover:scale-110"
+  render={<Link href="/register">ثبت‌نام</Link>}
+/>
+
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden"
-          aria-label="منو"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X /> : <Menu />}
-        </Button>
+<div className="flex items-center gap-2 lg:hidden">
+
+<Button
+  variant="ghost"
+  size="sm"
+  nativeButton={false}
+  render={<Link href="/login">ورود</Link>}
+/>
+
+
+<Button
+  size="sm"
+  nativeButton={false}
+className="register-glow rounded-2xl px-6 py-3 text-base font-extrabold text-black transition-all hover:scale-110"
+  render={<Link href="/register">ثبت‌نام</Link>}
+/>
+
+
+</div>      
+
       </div>
 
-      {open && (
-        <div className="border-t border-border bg-background lg:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
-            {navLinks.map((link) => (
-
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="mt-2 flex gap-2">
-              <Button
-                variant="outline"
-                size="lg"
-                className="flex-1"
-                render={<Link href="/login">ورود</Link>}
-              />
-              <Button
-                size="lg"
-                className="flex-1 bg-gold text-gold-foreground hover:bg-gold/90"
-                render={<Link href="/register">ثبت‌نام</Link>}
-              />
-            </div>
-          </nav>
-        </div>
-      )}
+            
     </header>
   )
 }

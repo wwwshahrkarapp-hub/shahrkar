@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, X, LogOut, type LucideIcon } from 'lucide-react'
+import { Menu, X, LogOut, Bell, type LucideIcon } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -26,7 +27,44 @@ export function DashboardShell({
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
+const [notificationCount, setNotificationCount] = useState(0);
+const router = useRouter()
+useEffect(() => {
 
+  async function loadNotificationCount() {
+
+    const savedUser = localStorage.getItem("user");
+
+    if (!savedUser) return;
+
+
+    const user = JSON.parse(savedUser);
+
+
+   const res = await fetch("/api/notifications/count", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+      }),
+    });
+
+
+    const data = await res.json();
+
+
+   if (data.success) {
+  setNotificationCount(data.count);
+}
+
+  }
+
+
+  loadNotificationCount();
+
+}, []);
   const sidebar = (
     <div className="flex h-full flex-col gap-6 p-4">
       <Link href="/" className="px-2">
@@ -43,9 +81,11 @@ export function DashboardShell({
               href={item.href}
               className={cn(
                 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                item.active
-                  ? 'bg-gold text-gold-foreground'
-                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+
+item.active
+ ? 'bg-yellow-400 text-black shadow-lg shadow-yellow-500/30 hover:scale-[1.02]'
+ : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+
               )}
               onClick={() => setOpen(false)}
             >
@@ -57,15 +97,35 @@ export function DashboardShell({
       </nav>
 
       <div className="mt-auto">
-        <Link href="/">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-muted-foreground"
-          >
-            <LogOut className="size-5" />
-            خروج از حساب
-          </Button>
-        </Link>
+       
+<Button
+  variant="ghost"
+  className="
+  w-full
+  justify-start
+  gap-3
+  rounded-xl
+  border
+  border-red-500/40
+  bg-red-500/10
+  text-red-400
+  font-bold
+  shadow-lg
+  shadow-red-500/20
+  transition-all
+  hover:bg-red-500/20
+  hover:scale-105
+  animate-bounce
+  "
+  onClick={() => {
+    localStorage.removeItem("user")
+    router.push("/")
+  }}
+>
+  <LogOut className="size-5" />
+  خروج از حساب
+</Button>
+
       </div>
     </div>
   )
@@ -112,26 +172,52 @@ export function DashboardShell({
               <Menu />
             </Button>
 
-            <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-medium text-gold">
-              {role}
-            </span>
+<span className="rounded-xl border border-yellow-300 bg-yellow-400 px-5 py-2 text-base font-extrabold text-black shadow-lg shadow-yellow-500/30">
+  {role}
+</span>
+
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">
-              خوش آمدید،
-            </span>
+         <div className="flex items-center gap-3">
 
-            <span className="flex items-center gap-2">
-              <span className="hidden text-sm font-medium text-foreground sm:inline">
-                {userName}
-              </span>
+<Link
+  href="/applicant/notifications"
+  className="relative flex size-10 items-center justify-center rounded-xl hover:bg-secondary"
+>
+  <Bell className="size-5 text-foreground" />
 
-              <span className="grid size-9 place-items-center rounded-full bg-gold text-sm font-bold text-gold-foreground">
-                {userName.charAt(0)}
-              </span>
-            </span>
-          </div>
+<span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+  {notificationCount}
+</span>
+</Link>
+
+
+<span className="flex items-center gap-2">
+  <span
+    className="
+    flex
+    items-center
+    justify-center
+    rounded-xl
+    border
+    border-yellow-300
+    bg-yellow-400
+    px-4
+    py-2
+    text-sm
+    font-extrabold
+    text-black
+    shadow-lg
+    shadow-yellow-500/50
+    animate-pulse
+    "
+  >
+    {userName || "کاربر شهرکار"}
+  </span>
+</span>
+
+
+</div>
         </header>
 
         <main className="flex-1 p-4 sm:p-6">
@@ -154,18 +240,18 @@ export function StatCard({
   hint?: string
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
+   <div className="rounded-2xl border border-border bg-card p-3">
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
           {label}
         </span>
 
-        <span className="grid size-9 place-items-center rounded-lg bg-gold/10 text-gold">
-          <Icon className="size-5" />
+       <span className="grid size-8 place-items-center rounded-lg bg-gold/10 text-gold">
+        <Icon className="size-4" />
         </span>
       </div>
 
-      <p className="mt-3 text-2xl font-extrabold text-foreground">
+     <p className="mt-2 text-xl font-extrabold text-foreground">
         {value}
       </p>
 

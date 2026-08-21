@@ -1,8 +1,29 @@
+'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Building2, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function CtaBanner() {
+const router = useRouter()
+
+const handleCompanyClick = () => {
+  const savedUser = localStorage.getItem("user")
+
+  if (!savedUser) {
+    router.push("/login")
+    return
+  }
+
+  const user = JSON.parse(savedUser)
+
+  if (user.role === "company") {
+    router.push("/company")
+  } else {
+    alert("فقط کارفرماها می‌توانند آگهی ثبت کنند")
+  }
+}
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="grid gap-5 md:grid-cols-2">
@@ -17,7 +38,7 @@ export function CtaBanner() {
           </p>
           <Button
             size="lg"
-            className="mt-2 bg-gold text-gold-foreground hover:bg-gold/90"
+           className="mt-2 rounded-2xl bg-yellow-500 px-6 font-bold text-black shadow-lg shadow-yellow-500/30 transition-all hover:scale-105 hover:bg-yellow-400 hover:shadow-yellow-500/50"
             render={<Link href="/register">ثبت‌نام کارجو</Link>}
           />
         </div>
@@ -31,12 +52,13 @@ export function CtaBanner() {
             آگهی استخدام ثبت کنید، به بانک رزومه دسترسی داشته باشید و بهترین
             استعدادها را جذب کنید.
           </p>
-          <Button
-            size="lg"
-            variant="outline"
-            className="mt-2"
-            render={<Link href="/company">ثبت آگهی شغلی</Link>}
-          />
+       <Button
+  size="lg"
+  className="mt-2 rounded-2xl bg-yellow-500 px-6 font-bold text-black shadow-lg shadow-yellow-500/30 transition-all hover:scale-105 hover:bg-yellow-400 hover:shadow-yellow-500/50"
+  onClick={handleCompanyClick}
+>
+  ثبت آگهی شغلی
+</Button>
         </div>
       </div>
     </section>
