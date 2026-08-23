@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin";
+import { adminAuth, adminDb } from "@/lib/firebase-admin";
 
 export async function POST(req: Request) {
-
   try {
+    const authHeader = req.headers.get("authorization");
 
-    const { uid } = await req.json();
-
-    if (!uid) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
-        { error: "UID وجود ندارد" },
-        { status: 400 }
+        { error: "احراز هویت انجام نشده است." },
+        { status: 401 }
       );
     }
+
+    const idToken = authHeader.substring(7);
+
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+
+    const uid = decodedToken.uid;
 
 
     const doc = await adminDb
@@ -24,27 +28,34 @@ export async function POST(req: Request) {
     if (!doc.exists) {
       return NextResponse.json(
         { error: "اطلاعات شرکت پیدا نشد" },
-        { status:404 }
+        { status: 404 }
       );
     }
 
 
     return NextResponse.json({
-      success:true,
-      company:{
+      success: true,
+      company: {
         uid: doc.id,
-        ...doc.data()
-      }
+        ...doc.data(),
+      },
     });
 
 
-  } catch(error:any){
+  } catch (error: unknown) {
+
+    console.error("COMPANY PROFILE GET ERROR:", error);
 
     return NextResponse.json(
-      {error:error.message},
-      {status:500}
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "خطا در دریافت پروفایل",
+      },
+      {
+        status: 500,
+      }
     );
-
   }
-
 }

@@ -1,17 +1,59 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { auth } from "@/lib/firebase";
 import Link from "next/link";
 
 export default function CompanySettingsPage() {
 
   const router = useRouter();
+const [unreadSupport, setUnreadSupport] = useState(0);
 
 
-  function logout() {
-    localStorage.removeItem("user");
-    router.push("/login");
+useEffect(() => {
+  async function loadSupportNotifications() {
+
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+
+    const res = await fetch("/api/company/support/unread", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+      }),
+    });
+
+
+    const data = await res.json();
+
+
+    if (data.success) {
+      setUnreadSupport(data.count);
+    }
+
   }
+
+
+  loadSupportNotifications();
+
+}, []);
+
+
+
+ function logout() {
+  const confirmLogout = confirm("آیا مطمئن هستید می‌خواهید از حساب خارج شوید؟");
+
+  if (!confirmLogout) return;
+
+  localStorage.removeItem("user");
+  router.push("/login");
+}
 
 
   return (
@@ -144,6 +186,37 @@ shadow-yellow-500/20
 
 
 
+  <Link href="/company/settings/security">
+    <div
+      className="
+      rounded-2xl
+      border
+      border-zinc-700
+      bg-zinc-950/80
+      px-6
+      py-5
+      font-bold
+      text-gray-200
+      shadow-lg
+      shadow-yellow-500/10
+      transition-all
+      hover:scale-105
+      hover:bg-zinc-900
+      cursor-pointer
+      "
+    >
+      🔐 امنیت
+
+      <p className="mt-2 text-sm text-gray-400">
+        رمز عبور و امنیت حساب
+      </p>
+
+    </div>
+  </Link>
+
+
+
+<Link href="/company/settings/support">
   <div
     className="
     rounded-2xl
@@ -159,42 +232,33 @@ shadow-yellow-500/20
     transition-all
     hover:scale-105
     hover:bg-zinc-900
+    cursor-pointer
     "
   >
-    🔐 امنیت
 
-    <p className="mt-2 text-sm text-gray-400">
-      رمز عبور و امنیت حساب
-    </p>
+<div className="flex items-center justify-between">
 
-  </div>
-
-
-
-  <div
-    className="
-    rounded-2xl
-    border
-    border-zinc-700
-    bg-zinc-950/80
-    px-6
-    py-5
-    font-bold
-    text-gray-200
-    shadow-lg
-    shadow-yellow-500/10
-    transition-all
-    hover:scale-105
-    hover:bg-zinc-900
-    "
-  >
+  <span>
     🆘 پشتیبانی
+  </span>
+
+
+  {unreadSupport > 0 && (
+    <span className="rounded-full bg-yellow-500 px-3 py-1 text-xs font-bold text-black">
+      {unreadSupport} پاسخ جدید
+    </span>
+  )}
+
+</div>
+
 
     <p className="mt-2 text-sm text-gray-400">
       ارتباط با پشتیبانی شهرکار
     </p>
 
   </div>
+</Link>
+
 
 
 </div>       

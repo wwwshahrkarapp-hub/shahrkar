@@ -12,6 +12,7 @@ export async function POST(req: Request) {
       );
     }
 
+
     const idToken = authHeader.substring(7);
 
     const decodedToken = await adminAuth.verifyIdToken(idToken);
@@ -19,55 +20,55 @@ export async function POST(req: Request) {
     const uid = decodedToken.uid;
 
 
-    const body = await req.json();
-
-    const {
-      name,
-      email,
-      phone,
-      city,
-      about,
-    } = body;
-
-
-    await adminDb
+    const userDoc = await adminDb
       .collection("users")
       .doc(uid)
-      .set(
+      .get();
+
+
+    if (!userDoc.exists) {
+      return NextResponse.json(
+        { error: "کاربر پیدا نشد." },
+        { status: 404 }
+      );
+    }
+
+
+    const user = userDoc.data();
+
+
+    if (user?.role !== "admin") {
+      return NextResponse.json(
         {
-          uid,
-          name: name || "",
-          email: email || "",
-          phone: phone || "",
-          city: city || "",
-          about: about || "",
-          role: "company",
-          updatedAt: new Date().toISOString(),
+          success: false,
+          message: "دسترسی مدیر لازم است."
         },
         {
-          merge: true,
+          status: 403
         }
       );
+    }
 
 
     return NextResponse.json({
       success: true,
+      admin: true
     });
 
 
   } catch (error: unknown) {
 
-    console.error("COMPANY PROFILE SAVE ERROR:", error);
+    console.error("ADMIN CHECK ERROR:", error);
 
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "خطا در ذخیره پروفایل",
+            : "خطا در بررسی دسترسی"
       },
       {
-        status: 500,
+        status: 500
       }
     );
   }

@@ -22,49 +22,62 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const {
-      name,
-      email,
-      phone,
-      city,
-      about,
+      subject,
+      message,
     } = body;
 
 
-    await adminDb
-      .collection("users")
-      .doc(uid)
-      .set(
-        {
-          uid,
-          name: name || "",
-          email: email || "",
-          phone: phone || "",
-          city: city || "",
-          about: about || "",
-          role: "company",
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          merge: true,
-        }
+    if (!subject || !message) {
+      return NextResponse.json(
+        { error: "موضوع و توضیحات الزامی است." },
+        { status: 400 }
       );
+    }
+
+
+    const ticketRef = adminDb
+      .collection("supportTickets")
+      .doc();
+
+
+    const now = new Date().toISOString();
+
+
+await ticketRef.set({
+  uid,
+  subject,
+  message,
+
+  messages: [
+    {
+      text: message,
+      sender: "company",
+      createdAt: now,
+    },
+  ],
+
+  status: "open",
+  createdAt: now,
+  updatedAt: now,
+});
 
 
     return NextResponse.json({
       success: true,
+      ticketId: ticketRef.id,
     });
 
 
   } catch (error: unknown) {
 
-    console.error("COMPANY PROFILE SAVE ERROR:", error);
+    console.error("SUPPORT CREATE ERROR:", error);
 
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "خطا در ذخیره پروفایل",
+            : "خطا در ثبت درخواست پشتیبانی",
       },
       {
         status: 500,

@@ -1,6 +1,9 @@
 'use client'
+
+
 import Link from 'next/link'
 import { useEffect, useState } from "react";
+import { auth } from "@/lib/firebase";
 import {
   LayoutDashboard,
   FileText,
@@ -78,16 +81,51 @@ const [stats, setStats] = useState({
 });
 
 const [recentJobs, setRecentJobs] = useState<any[]>([]);
-
+const [unreadSupport, setUnreadSupport] = useState(0);
 const [showAllJobs, setShowAllJobs] = useState(false); 
 
   
+useEffect(() => {
+  async function loadSupportNotifications() {
+
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+
+    const res = await fetch("/api/company/support/unread", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+      }),
+    });
+
+
+    const data = await res.json();
+
+
+    if (data.success) {
+      setUnreadSupport(data.count);
+    }
+  }
+
+
+  loadSupportNotifications();
+
+}, []);
+
+
+
+
 useEffect(() => {
 
   const savedUser = localStorage.getItem("user");
 
   if(savedUser){
-
+ 
     const user = JSON.parse(savedUser);
 
     console.log("COMPANY USER:", user);
@@ -166,6 +204,7 @@ setStats((prev)=>({
 
 
   return (
+
     <DashboardShell
       role="پنل کارفرما"
       userName={companyName}
@@ -179,6 +218,27 @@ setStats((prev)=>({
             مدیریت آگهی‌ها و درخواست‌های استخدام
           </p>
         </div>
+
+
+
+
+{unreadSupport > 0 && (
+  <div className="mb-5 rounded-2xl border border-yellow-500/40 bg-yellow-950/70 p-5 shadow-lg shadow-yellow-500/20">
+
+    <h2 className="font-bold text-yellow-300">
+      🔔 پاسخ جدید پشتیبانی دارید
+    </h2>
+
+    <p className="mt-2 text-sm text-gray-300">
+      مدیر شهرکار به درخواست شما پاسخ داده است.
+    </p>
+
+  </div>
+)}
+
+
+
+
         <Link href="/company/jobs/new">
 <Button
   size="lg"

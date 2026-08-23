@@ -12,6 +12,7 @@ export async function POST(req: Request) {
       );
     }
 
+
     const idToken = authHeader.substring(7);
 
     const decodedToken = await adminAuth.verifyIdToken(idToken);
@@ -19,55 +20,59 @@ export async function POST(req: Request) {
     const uid = decodedToken.uid;
 
 
-    const body = await req.json();
-
-    const {
-      name,
-      email,
-      phone,
-      city,
-      about,
-    } = body;
-
-
-    await adminDb
+    const adminDoc = await adminDb
       .collection("users")
       .doc(uid)
-      .set(
+      .get();
+
+
+    const adminUser = adminDoc.data();
+
+
+    if (!adminUser || adminUser.role !== "admin") {
+      return NextResponse.json(
         {
-          uid,
-          name: name || "",
-          email: email || "",
-          phone: phone || "",
-          city: city || "",
-          about: about || "",
-          role: "company",
-          updatedAt: new Date().toISOString(),
+          error: "دسترسی مدیر لازم است."
         },
         {
-          merge: true,
+          status: 403
         }
       );
+    }
+
+
+    const snapshot = await adminDb
+      .collection("supportTickets")
+      .orderBy("createdAt", "desc")
+      .get();
+
+
+    const tickets = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
 
     return NextResponse.json({
       success: true,
+      tickets,
     });
 
 
   } catch (error: unknown) {
 
-    console.error("COMPANY PROFILE SAVE ERROR:", error);
+    console.error("ADMIN SUPPORT LIST ERROR:", error);
+
 
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "خطا در ذخیره پروفایل",
+            : "خطا در دریافت تیکت‌ها"
       },
       {
-        status: 500,
+        status: 500
       }
     );
   }

@@ -19,52 +19,35 @@ export async function POST(req: Request) {
     const uid = decodedToken.uid;
 
 
-    const body = await req.json();
-
-    const {
-      name,
-      email,
-      phone,
-      city,
-      about,
-    } = body;
+    const snapshot = await adminDb
+      .collection("supportTickets")
+      .where("uid", "==", uid)
+      .orderBy("createdAt", "desc")
+      .get();
 
 
-    await adminDb
-      .collection("users")
-      .doc(uid)
-      .set(
-        {
-          uid,
-          name: name || "",
-          email: email || "",
-          phone: phone || "",
-          city: city || "",
-          about: about || "",
-          role: "company",
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          merge: true,
-        }
-      );
+    const tickets = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
 
     return NextResponse.json({
       success: true,
+      tickets,
     });
 
 
   } catch (error: unknown) {
 
-    console.error("COMPANY PROFILE SAVE ERROR:", error);
+    console.error("SUPPORT MY ERROR:", error);
 
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "خطا در ذخیره پروفایل",
+            : "خطا در دریافت درخواست‌ها",
       },
       {
         status: 500,
