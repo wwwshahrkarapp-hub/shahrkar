@@ -5,3 +5,6 @@ allowBuilds:
   msw: true
   protobufjs: true
   sharp: true
+
+overrides:
+  'jwks-rsa>jose': '4.15.9'
