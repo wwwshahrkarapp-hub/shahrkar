@@ -19,7 +19,7 @@ type?: string;
 }) {
 
  const res = await fetch(
-  `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/jobs`,
+  `${process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")}/api/jobs`,
   {
     cache: "no-store",
   }
