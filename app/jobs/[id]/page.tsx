@@ -20,7 +20,7 @@ async function getJob(id: string): Promise<Job | null> {
   try {
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/jobs/${id}`,
+      `${process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")}/api/jobs/${id}`,
       {
         cache: "no-store",
       }
