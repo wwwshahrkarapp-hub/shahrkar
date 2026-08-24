@@ -6,6 +6,7 @@ import JobAccessLink from "@/components/job-access-link";
 import type { Job } from "@/lib/data";
 import { categories } from "@/lib/data";
 import JobFilters from "@/components/job-filters";
+import { adminDb } from "@/lib/firebase-admin";
 
 export default async function JobsPage({
   searchParams,
@@ -18,14 +19,16 @@ type?: string;
 }>;
 }) {
 
- const res = await fetch(
-  `${process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")}/api/jobs`,
-  {
-    cache: "no-store",
-  }
-);
+  const snapshot = await adminDb
+    .collection("jobs")
+    .orderBy("createdAt", "desc")
+    .limit(20)
+    .get();
 
-let jobs: Job[] = await res.json();
+  let jobs: Job[] = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as Omit<Job, "id">),
+  }));
 
  const { search, city, category, type } = await searchParams;
 const selectedCategory = categories.find(
