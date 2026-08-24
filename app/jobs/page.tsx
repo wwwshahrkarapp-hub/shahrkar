@@ -8,6 +8,8 @@ import { categories } from "@/lib/data";
 import JobFilters from "@/components/job-filters";
 import { adminDb } from "@/lib/firebase-admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function JobsPage({
   searchParams,
 }: {

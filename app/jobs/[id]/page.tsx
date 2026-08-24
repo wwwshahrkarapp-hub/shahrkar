@@ -24,7 +24,16 @@ async function getJob(id: string): Promise<Job | null> {
     if (doc.exists) {
       return {
         id: doc.id,
-        ...(doc.data() as Omit<Job, "id">),
+        ...(() => {
+          const data = doc.data();
+          return {
+            ...data,
+            createdAt:
+              data.createdAt?.toDate?.()?.toISOString?.() ??
+              data.createdAt ??
+              null,
+          };
+        })(),
       };
     }
 
@@ -42,7 +51,16 @@ async function getJob(id: string): Promise<Job | null> {
     if (found) {
       return {
         id: found.id,
-        ...(found.data() as Omit<Job, "id">),
+        ...(() => {
+          const data = found.data();
+          return {
+            ...data,
+            createdAt:
+              data.createdAt?.toDate?.()?.toISOString?.() ??
+              data.createdAt ??
+              null,
+          };
+        })(),
       };
     }
 
