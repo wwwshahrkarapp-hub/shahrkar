@@ -1,48 +1,56 @@
 import { notFound } from "next/navigation";
-import fs from "fs/promises";
+import { adminDb } from "@/lib/firebase-admin";
 import JobActions from "./JobActions";
-import path from "path";
-import Link from "next/link";
-import SaveButton from "./SaveButton";
+
 type Job = {
-  id: number;
+  id: string;
   title: string;
   company: string;
   city: string;
   salary: string;
   type?: string;
   description: string;
-  createdAt: string;
+  createdAt?: any;
+  category?: string;
+  skills?: string[];
+  ownerUid?: string;
+  status?: string;
 };
 
 async function getJob(id: string): Promise<Job | null> {
-
   try {
+    const doc = await adminDb.collection("jobs").doc(id).get();
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")}/api/jobs/${id}`,
-      {
-        cache: "no-store",
-      }
-    );
-
-
-    if (!res.ok) {
-      return null;
+    if (doc.exists) {
+      return {
+        id: doc.id,
+        ...(doc.data() as Omit<Job, "id">),
+      };
     }
 
+    const snapshot = await adminDb.collection("jobs").get();
 
-    const data = await res.json();
+    const found = snapshot.docs.find((item) => {
+      const data = item.data();
 
-    return data;
+      return (
+        String(data.id ?? "") === String(id) ||
+        String(data.jobId ?? "") === String(id)
+      );
+    });
 
-
-  } catch {
+    if (found) {
+      return {
+        id: found.id,
+        ...(found.data() as Omit<Job, "id">),
+      };
+    }
 
     return null;
-
+  } catch (error) {
+    console.error("Failed to load job:", error);
+    return null;
   }
-
 }
 
 export default async function JobDetails({
@@ -59,10 +67,9 @@ export default async function JobDetails({
   }
 
   return (
-  <main className="min-h-screen bg-background text-foreground p-6">
-    <div className="max-w-2xl mx-auto rounded-3xl border border-yellow-500/20 bg-card p-8 shadow-xl shadow-yellow-500/10">
-
-      <h1 className="mb-6 text-3xl font-extrabold text-yellow-400">
+    <main className="min-h-screen bg-background text-foreground p-6">
+      <div className="max-w-2xl mx-auto rounded-3xl border border-yellow-500/20 bg-card p-8 shadow-xl shadow-yellow-500/10">
+        <h1 className="mb-6 text-3xl font-extrabold text-yellow-400">
           {job.title}
         </h1>
 
@@ -88,8 +95,7 @@ export default async function JobDetails({
           {job.description}
         </p>
 
-       <JobActions job={job} />
-
+        <JobActions job={job} />
       </div>
     </main>
   );
