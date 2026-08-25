@@ -3,10 +3,14 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'شهرکار | جستجوی هوشمند فرصت‌های شغلی',
+ title: '56568433',
   description:
-    'شهرکار، پلتفرم حرفه‌ای کاریابی؛ هزاران فرصت شغلی از بهترین شرکت‌های ایران را جستجو کنید و رزومه بسازید.',
+    'شهرکار، پلتفرم حرفه‌ای کاریابی؛ هزاران فرصت شغلی از بهترین شرکت‌های ایران را پیدا کنید.',
   generator: 'v0.app',
+
+  other: {
+    enamad: '56568433',
+  },
 }
 
 export const viewport: Viewport = {
@@ -31,7 +35,6 @@ export default function RootLayout({
         {process.env.NODE_ENV === 'production' && (
           <Analytics />
         )}
-
       </body>
     </html>
   )
