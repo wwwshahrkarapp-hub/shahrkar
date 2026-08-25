@@ -5,6 +5,12 @@ import { CategoriesSection } from '@/components/categories-section'
 import { LatestJobs } from '@/components/latest-jobs'
 import { CtaBanner } from '@/components/cta-banner'
 import { SiteStats } from '@/components/site-stats'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: '56568433',
+}
+
 
 export default function HomePage() {
   return (
