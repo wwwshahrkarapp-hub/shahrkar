@@ -21,21 +21,21 @@ async function getJob(id: string): Promise<Job | null> {
   try {
     const doc = await adminDb.collection("jobs").doc(id).get();
 
-    if (doc.exists) {
-      return {
-        id: doc.id,
-        ...(() => {
-          const data = doc.data();
-          return {
-            ...data,
-            createdAt:
-              data.createdAt?.toDate?.()?.toISOString?.() ??
-              data.createdAt ??
-              null,
-          };
-        })(),
-      };
-    }
+
+if (doc.exists) {
+  const data = doc.data();
+
+  if (!data) return null;
+
+  return {
+    id: doc.id,
+    ...(data as Omit<Job, "id">),
+    createdAt:
+      data.createdAt?.toDate?.()?.toISOString?.() ??
+      data.createdAt ??
+      null,
+  };
+}
 
     const snapshot = await adminDb.collection("jobs").get();
 
@@ -48,21 +48,18 @@ async function getJob(id: string): Promise<Job | null> {
       );
     });
 
-    if (found) {
-      return {
-        id: found.id,
-        ...(() => {
-          const data = found.data();
-          return {
-            ...data,
-            createdAt:
-              data.createdAt?.toDate?.()?.toISOString?.() ??
-              data.createdAt ??
-              null,
-          };
-        })(),
-      };
-    }
+   if (found) {
+  const data = found.data();
+
+  return {
+    id: found.id,
+    ...(data as Omit<Job, "id">),
+    createdAt:
+      data.createdAt?.toDate?.()?.toISOString?.() ??
+      data.createdAt ??
+      null,
+  };
+}
 
     return null;
   } catch (error) {
