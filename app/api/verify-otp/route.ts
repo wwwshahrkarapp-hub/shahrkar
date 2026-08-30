@@ -28,12 +28,12 @@ export async function POST(req: Request) {
 
 
   const savedCode =
-    getOtp(phone)
+    await getOtp(phone)
 
 
   if(savedCode === code){
 
-  removeOtp(phone)
+  await removeOtp(phone)
 
   return NextResponse.json({
 

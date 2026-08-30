@@ -1,70 +1,38 @@
-import fs from "fs"
-import path from "path"
+import { adminDb } from "@/lib/firebase-admin"
+import { FieldValue } from "firebase-admin/firestore"
 
-const filePath = path.join(
-  process.cwd(),
-  "otp-data.json"
-)
+const collection = "otpCodes"
 
-export function saveOtp(
-  phone:string,
-  code:string
-){
-
-  let data:any = {}
-
-  if(fs.existsSync(filePath)){
-    data = JSON.parse(
-      fs.readFileSync(filePath,"utf8")
-    )
-  }
-
-  data[phone] = code
-
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(data)
-  )
-
+export async function saveOtp(
+  phone: string,
+  code: string
+) {
+  await adminDb.collection(collection).doc(phone).set({
+    code,
+    createdAt: FieldValue.serverTimestamp(),
+  })
 }
 
+export async function getOtp(
+  phone: string
+) {
+  const snap = await adminDb
+    .collection(collection)
+    .doc(phone)
+    .get()
 
-export function getOtp(
-  phone:string
-){
-
-  if(!fs.existsSync(filePath)){
+  if (!snap.exists) {
     return null
   }
 
-  const data =
-    JSON.parse(
-      fs.readFileSync(filePath,"utf8")
-    )
-
-  return data[phone]
-
+  return snap.data()?.code || null
 }
 
-
-export function removeOtp(
-  phone:string
-){
-
-  if(!fs.existsSync(filePath)){
-    return
-  }
-
-  const data =
-    JSON.parse(
-      fs.readFileSync(filePath,"utf8")
-    )
-
-  delete data[phone]
-
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(data)
-  )
-
+export async function removeOtp(
+  phone: string
+) {
+  await adminDb
+    .collection(collection)
+    .doc(phone)
+    .delete()
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const res = await fetch("https://www.shahrkarjob.ir/api/cities", {
+    const res = await fetch("https://www.shahrkarjob.ir/api/jobs", {
       cache: "no-store",
     });
 

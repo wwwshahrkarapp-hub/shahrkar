@@ -27,15 +27,24 @@ useEffect(() => {
 }, [id]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-const savedUser = localStorage.getItem("user");
+
+ const savedUser = localStorage.getItem("user");
 
 if (!savedUser) {
-  alert("لطفاً وارد حساب کاربری شوید");
+  alert("لطفاً ابتدا ثبت‌نام کنید");
   router.push("/register");
   return;
 }
 
 const user = JSON.parse(savedUser);
+
+if (!user?.uid) {
+  alert("لطفاً ابتدا ثبت‌نام کنید");
+  localStorage.removeItem("user");
+  router.push("/register");
+  return;
+}
+
     if (!name || !phone) {
       alert("نام و شماره موبایل الزامی است.");
       return;

@@ -16,10 +16,11 @@ export function LatestJobs() {
 
     async function loadJobs(){
 
-      const res = await fetch("/api/jobs");
+const res = await fetch("/api/latest-jobs");    
 
      const data = await res.json();
 
+console.log("LATEST JOBS DATA:", data);
 if (Array.isArray(data)) {
   setJobs(data);
 } else {
@@ -69,7 +70,6 @@ if (Array.isArray(data)) {
 
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-
 
         {jobs.map((job)=>(
 

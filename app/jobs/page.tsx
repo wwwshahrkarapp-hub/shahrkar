@@ -6,7 +6,7 @@ import JobAccessLink from "@/components/job-access-link";
 import type { Job } from "@/lib/data";
 import { categories } from "@/lib/data";
 import JobFilters from "@/components/job-filters";
-import { adminDb } from "@/lib/firebase-admin";
+
 
 export const dynamic = "force-dynamic";
 
@@ -21,16 +21,15 @@ type?: string;
 }>;
 }) {
 
-  const snapshot = await adminDb
-    .collection("jobs")
-    .orderBy("createdAt", "desc")
-    .limit(20)
-    .get();
 
-  let jobs: Job[] = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<Job, "id">),
-  }));
+const res = await fetch("https://www.shahrkarjob.ir/api/jobs", {
+  cache: "no-store",
+});
+
+const data = await res.json();
+
+let jobs: Job[] = data;
+
 
  const { search, city, category, type } = await searchParams;
 const selectedCategory = categories.find(

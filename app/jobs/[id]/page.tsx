@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { adminDb } from "@/lib/firebase-admin";
 import JobActions from "./JobActions";
 
 type Job = {
@@ -17,56 +16,24 @@ type Job = {
   status?: string;
 };
 
+
 async function getJob(id: string): Promise<Job | null> {
   try {
-    const doc = await adminDb.collection("jobs").doc(id).get();
-
-
-if (doc.exists) {
-  const data = doc.data();
-
-  if (!data) return null;
-
-  return {
-    id: doc.id,
-    ...(data as Omit<Job, "id">),
-    createdAt:
-      data.createdAt?.toDate?.()?.toISOString?.() ??
-      data.createdAt ??
-      null,
-  };
-}
-
-    const snapshot = await adminDb.collection("jobs").get();
-
-    const found = snapshot.docs.find((item) => {
-      const data = item.data();
-
-      return (
-        String(data.id ?? "") === String(id) ||
-        String(data.jobId ?? "") === String(id)
-      );
+    const res = await fetch(`https://www.shahrkarjob.ir/api/jobs/${id}`, {
+      cache: "no-store",
     });
 
-   if (found) {
-  const data = found.data();
+    if (!res.ok) return null;
 
-  return {
-    id: found.id,
-    ...(data as Omit<Job, "id">),
-    createdAt:
-      data.createdAt?.toDate?.()?.toISOString?.() ??
-      data.createdAt ??
-      null,
-  };
-}
+    const data = await res.json();
 
-    return null;
+    return data;
   } catch (error) {
     console.error("Failed to load job:", error);
     return null;
   }
 }
+
 
 export default async function JobDetails({
   params,

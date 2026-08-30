@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { useRouter } from "next/navigation"
-import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import PageHeader from "@/components/page-header";
 
@@ -167,35 +166,26 @@ console.log(
   "SAVED USER:",
   localStorage.getItem("user")
 )
-const tokenRes = await fetch("/api/create-token", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    uid: userData.user.uid,
-  }),
-});
 
-const tokenData = await tokenRes.json();
+  const sessionRes = await fetch("/api/auth/session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      uid: userData.user.uid,
+    }),
+  });
 
-if (!tokenData.success) {
-  alert(tokenData.error);
-  return;
-}
+  const sessionData = await sessionRes.json();
 
-await signInWithCustomToken(
-  auth,
-  tokenData.token
-);
+  if (!sessionData.success) {
+    alert(sessionData.error || "خطا در ساخت نشست");
+    return;
+  }
 
-console.log(
-  "FIREBASE AUTH USER:",
-  auth.currentUser
-);
-await new Promise(
-  resolve => setTimeout(resolve, 1000)
-);
+  console.log("SECURE SESSION CREATED");
+
 if (redirect) {
   router.push(redirect)
 } else if (userData.user.role === "company") {
@@ -206,15 +196,13 @@ if (redirect) {
 
 
 
-    }catch(error){
-
-      console.log(error)
-
-
-      alert(
-        "خطا در بررسی کد"
-      )
-
+}catch(error){
+  console.error("LOGIN ERROR:", error)
+  alert(
+    error instanceof Error
+      ? error.message
+      : "خطا در بررسی کد"
+  )
 
     }finally{
 
