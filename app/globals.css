@@ -1,3 +1,16 @@
+@font-face {
+  font-family: "Estedad";
+  src: url("/fonts/estedad/Estedad[wght].woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --font-vazir: "Estedad";
+  --font-inter: "Estedad";
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,7 +38,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  font-family: var(--font-vazir), sans-serif;
+  font-family: "Estedad", sans-serif;
 }
 
 
