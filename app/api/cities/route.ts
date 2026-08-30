@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
+import { adminDb } from "@/lib/firebase-admin";
 
 export async function GET() {
-  try {
-    const res = await fetch("https://www.shahrkarjob.ir/api/cities", {
-      cache: "no-store",
-    });
+  const snapshot = await adminDb
+    .collection("jobs")
+    .get();
 
-    const data = await res.json();
+  const cities = Array.from(
+    new Set(
+      snapshot.docs
+        .map((doc) => doc.data().city)
+        .filter(Boolean)
+    )
+  );
 
-    return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      {
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
-  }
+  return NextResponse.json(cities);
 }
