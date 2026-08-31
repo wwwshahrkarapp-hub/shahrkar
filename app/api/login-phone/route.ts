@@ -1,33 +1,61 @@
 import { NextResponse } from "next/server";
+import { adminDb } from "@/lib/firebase-admin";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const { phone } = await req.json();
 
-    const res = await fetch(
-      "https://www.shahrkarjob.ir/api/login-phone",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    if (!phone) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "شماره تلفن وارد نشده است.",
         },
-        body: JSON.stringify(body),
-      }
+        { status: 400 }
+      );
+    }
+
+    const snapshot = await adminDb
+      .collection("users")
+      .where("phone", "==", phone)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "کاربر با این شماره پیدا نشد.",
+        },
+        { status: 404 }
+      );
+    }
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        uid: doc.id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "LOGIN PHONE ERROR:",
+      error instanceof Error ? error.message : "Unknown error"
     );
 
-    const data = await res.json();
-
-    return NextResponse.json(data, {
-      status: res.status,
-    });
-  } catch (error: any) {
     return NextResponse.json(
       {
-        error: error.message,
+        success: false,
+        error: "خطا در ورود با شماره تلفن",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
