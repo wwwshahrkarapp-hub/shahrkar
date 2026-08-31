@@ -17,12 +17,11 @@ export async function POST(req: Request) {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString()
 
-    const username = process.env.PAYAMMATNI_USERNAME
-    const password = process.env.PAYAMMATNI_PASSWORD
-    const from = process.env.PAYAMMATNI_FROM
+    const relayUrl = process.env.OTP_RELAY_URL
+    const relaySecret = process.env.OTP_RELAY_SECRET
 
-    if (!username || !password || !from) {
-      console.error("PayamMatni environment variables are missing")
+    if (!relayUrl || !relaySecret) {
+      console.error("OTP relay environment variables are missing")
 
       return NextResponse.json(
         {
@@ -33,44 +32,32 @@ export async function POST(req: Request) {
       )
     }
 
-    const params = new URLSearchParams({
-      method: "sendsms",
-      format: "json",
-      from,
-      to: phone,
-      text: `کد ورود شهرکار: ${code}`,
-      username,
-      password,
-      type: "0",
+    const response = await fetch(`${relayUrl}/send-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-relay-secret": relaySecret,
+      },
+      body: JSON.stringify({
+        to: phone,
+        text: `کد ورود شهرکار: ${code}`,
+      }),
+      cache: "no-store",
     })
 
-    const response = await fetch(
-      `https://payammatni.com/webservice/url/send.php?${params.toString()}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    )
+    const result = await response.json()
 
-    const result = await response.text()
+    console.log("OTP Relay response:", {
+      status: response.status,
+      ok: result?.ok,
+      error: result?.error,
+    })
 
-    console.log("PayamMatni response:", result)
-
-    if (!response.ok) {
+    if (!response.ok || !result?.ok) {
       return NextResponse.json(
         {
           success: false,
           message: "ارسال پیامک انجام نشد",
-        },
-        { status: 502 }
-      )
-    }
-
-    if (result.includes('"4"')) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "ارسال پیامک از طرف سرویس انجام نشد",
         },
         { status: 502 }
       )
@@ -83,7 +70,11 @@ export async function POST(req: Request) {
       message: "کد ارسال شد",
     })
   } catch (error) {
-    console.error("Send OTP error:", error)
+    console.error(
+      "Send OTP error type:",
+      error instanceof Error ? error.name : "Unknown",
+      error instanceof Error ? error.message : "Non-Error"
+    )
 
     return NextResponse.json(
       {
